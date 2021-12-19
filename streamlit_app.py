@@ -1,62 +1,40 @@
-
+import yfinance as yf
 import streamlit as st
-import  os
-# import requests
-# Import libraries
-# sys.path.append("app_imagecaption_")
+import pandas as pd
+import math
+import numpy as np
+import pandas_datareader as web
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
+import matplotlib.pyplot as plt
 
-import gdown
-# data flick30k
-url_data = "https://drive.google.com/uc?id=1h4Aa2zqOZu7XPdg-pWW5KmHLxqbvs1jn"
-output_data = "flickr30k.zip"
-
-
-
-
-#########################################################
-##### GIAO DIỆN
-#########################################################
-#st.title("**OBJECT DETECTION**")
-st.markdown("<h1 style='text-align: center;'>IMAGE CAPTIONING</h1>", unsafe_allow_html=True)
 st.markdown("""
-|Mentor   | Nguyễn Minh Trang  |
-|:-------:|:------------------:|
-| LOGIK   |XXX                 |
-|         |XXX                 |
-|         |XXX                 |
-|         |XXX                 |
+#Stock Predictor
+This website can predict the value of a stock price in the in the future
+""")
+
+st.write("""Disclaimer: Any investing is done at the investors expense, we are not responsible for any actions taken.
+""")
+
+try:
+    ticker = st.text_input("Enter Ticker symbol below", "GOOGL")
+    df = web.DataReader(ticker, data_source='yahoo', start='2012-01-01', end='2019-12-17')
+
+except:
+    ticker = 'GOOGL'
+    df = web.DataReader(ticker, data_source='yahoo', start='2012-01-01', end='2019-12-17')
+
+#visualization
+st.line_chart(df['Close'])
+st.caption(ticker+' stock price.')
+
+
+valid, train, predictions = sp.make_model(df)
+
+valid['Predictions'] = predictions
+
 """
-            
-            , unsafe_allow_html=True)
-
-st.write("Bắt đầu dowload")
-
-def download_data(url, output):      
-    if (os.path.exists(output)==False):
-        gdown.download(url, output, quiet=False)
-#tai data_flick30k.zip
-# download_data(url_data, output_data)
-
-# import zipfile
-# with zipfile.ZipFile("flickr30k.zip", 'r') as zip_ref:
-#     zip_ref.extractall("image_data")
-
-
-
-os.system("pwd")
-st.write(os.listdir("image_data/flickr30k_images"))
-st.write("đã giải nén")
-
-
-option = st.selectbox('Chọn model',('CLIP_', 'Yolov4'))
-#st.write('You selected:', option)
-
-##################################################################
-
-#################
-#### MAIN
-################
-img_l = st.file_uploader("Upload Image",type=['jpg'])
-
-
-button = st.button("Bắt đầu tạo caption")
+Actual Price vs Predicted
+"""
+st.line_chart(valid)
